@@ -1,0 +1,4 @@
+docker/*
+logs/*
+.git
+node_modules

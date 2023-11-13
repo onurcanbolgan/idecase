@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+    # PHP Service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: app:latest
+        restart: unless-stopped
+        container_name: app_container
+        ports:
+            - "80:80"
+        volumes:
+            - .:/var/www/html
+        depends_on:
+            - db
+            - redis
+
+    # MySQL Service
+    db:
+        image: mysql:8.0
+        restart: unless-stopped
+        container_name: db
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./mysql-data:/var/lib/mysql
+
+    # Redis Service
+    redis:
+        image: redis:latest
+        restart: unless-stopped
+        container_name: redis_container
+        ports:
+            - "6379:6379"
+        volumes:
+            - ./redis-data:/data
+
+    # phpMyAdmin Service
+    phpMyAdmin:
+        image: phpmyadmin:latest
+        ports:
+            - '8080:80'
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        depends_on:
+            - db
